@@ -130,6 +130,8 @@ def animar_navegacao(lado="ida"):
 
 def escolher_passageiros(margem_atual):
     global missio_mar1, cani_mar1, missio_mar2, cani_mar2
+
+    estado_anterior = (missio_mar1, cani_mar1, missio_mar2, cani_mar2)
     passar1, passar2 = "_", "_"
 
     while True:
@@ -147,12 +149,16 @@ def escolher_passageiros(margem_atual):
             else:
                 cani_mar2 -= 1
             break
+        elif passar1 == "D":
+            
+            missio_mar1, cani_mar1, missio_mar2, cani_mar2 = estado_anterior
+            return "_", "_"  
         else:
             print("Escolha inválida ou insuficiente na margem. Tente novamente.")
 
     while True:
         estado_margens(passar1, passar2, "ida" if margem_atual == 1 else "volta")
-        passar2 = input("Deseja adicionar mais alguém? [M]-Missionário [C]-Canibal [N]-Não: ").strip().upper()
+        passar2 = input("Deseja adicionar mais alguém? [M]-Missionário [C]-Canibal [N]-Não [D]-Desfazer jogada anterior: ").strip().upper()
         if passar2 == "N":
             break
         elif passar2 == "M" and ((missio_mar1 if margem_atual == 1 else missio_mar2) > 0):
@@ -167,8 +173,12 @@ def escolher_passageiros(margem_atual):
             else:
                 cani_mar2 -= 1
             break
+        elif passar2 == "D":
+        
+            missio_mar1, cani_mar1, missio_mar2, cani_mar2 = estado_anterior
+            return "_", "_"  
         else:
-            print("Escolha inválida ou insuficiente na margem. Tente novamente.")
+            print("Escolha inválida!")
 
     return passar1, passar2
 
@@ -191,9 +201,14 @@ def jogo():
     while not fim:
         estado_margens()
         passar1, passar2 = escolher_passageiros(margem_atual)
+
+        if passar1 == "_" and passar2 == "_":
+            continue 
         animar_navegacao("ida" if margem_atual == 1 else "volta")
+        estado_margens()
         atualizar_margens(passar1, passar2, margem_atual)
         margem_atual = 2 if margem_atual == 1 else 1
+        estado_margens()
         validar_estado()
 
 jogo()
